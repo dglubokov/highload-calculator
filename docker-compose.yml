@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    restart: always
+    command: python ./calculator/main.py
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    links:
+      - db:postgres.local
