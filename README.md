@@ -20,3 +20,7 @@ Local run:
 Run with docker:
 
 ```make runisolated```
+
+Test client:
+
+```make test```
