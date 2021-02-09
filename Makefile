@@ -14,5 +14,8 @@ run:
 	pipenv run python ./calculator/main.py
 
 runisolated:
-	docker-compose up -d
+	docker-compose up
+
+test:
+	pipenv run python ./calculator/client.py
 

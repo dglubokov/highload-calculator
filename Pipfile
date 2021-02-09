@@ -7,6 +7,8 @@ name = "pypi"
 fastapi = "*"
 uvicorn = "*"
 numpy = "*"
+httpx = "*"
+pandas = "*"
 
 [dev-packages]
 flake8 = "*"

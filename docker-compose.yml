@@ -5,3 +5,4 @@ services:
     command: python ./calculator/main.py
     volumes:
       - .:/app
+    network_mode: "host"

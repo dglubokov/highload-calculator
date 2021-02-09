@@ -3,7 +3,6 @@ import enum
 import json
 from typing import Dict, List
 from uuid import UUID, uuid4
-from concurrent.futures.process import ProcessPoolExecutor
 
 import numpy as np
 import pydantic
@@ -36,19 +35,8 @@ calcs: Dict[str, Calculation] = {}
 
 async def calculate(X: int, uid: UUID):
     """Computing a random matrix X by X."""
-    await asyncio.sleep(20)  # Sleep for tests.
+    await asyncio.sleep(X)  # Sleep for tests.
     calcs[uid].result = json.dumps(np.random.rand(X, X).tolist())
-
-
-async def run_in_process(fn, *args):
-    """Run in a separate process."""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(app.state.executor, fn, *args)
-
-
-async def start_task(X: int, uid: UUID):
-    """Init task."""
-    calcs[uid].result = await run_in_process(calculate, X)
     calcs[uid].status = Status.END.value
 
 
@@ -68,7 +56,7 @@ async def get_calculate(
     """
     new_calc = Calculation()
     calcs[new_calc.uid] = new_calc
-    background_tasks.add_task(start_task, X, new_calc.uid)
+    background_tasks.add_task(calculate, X, new_calc.uid)
     return new_calc.uid
 
 
@@ -83,18 +71,6 @@ async def get_result(uid: UUID) -> Dict:
     if calcs[uid].status == Status.END.value:
         return calcs[uid].result
     return JSONResponse(content="", status_code=201)
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Starting the asynchronous execution of requests."""
-    app.state.executor = ProcessPoolExecutor()
-
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    """Ending the asynchronous execution of requests."""
-    app.state.executor.shutdown()
 
 
 if __name__ == "__main__":
